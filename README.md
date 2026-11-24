@@ -1,105 +1,151 @@
 WINDOWS-EVENT-LOG-ANALYSIS-PROJECT
 
-Windows Event Log Analysis for Threat Detection and Incident Investigation
+Windows Event Log Analysis for Threat Detection & Incident Investigation
 
 Table of Contents
+
 Project Overview
+
 Windows Logon Events Analysis
+
 User Account Management
+
 Process Monitoring with Sysmon
-File and Network Activity Investigation
+
+File & Network Activity Investigation
+
 PowerShell Activity Monitoring
+
 Tools & Technologies
-Key Takeaways
+
 Conclusion
 
-Project Overview
-Windows Event Logs provide valuable visibility into system activities, including user authentication, process execution, account modifications, file creation, and network connections.
-In this project, I analysed Windows Security and Sysmon event logs using Event Viewer and PowerShell to investigate suspicious activities, identify indicators of compromise (IOCs), and reconstruct an attack sequence.
-The investigation covered brute-force attacks, RDP compromise, unauthorised account creation, privilege escalation, malicious file downloads, Command-and-Control (C2) communication, and PowerShell activity.
+1. Project Overview
 
-Windows Logon Events Analysis
-Investigated authentication activities to identify suspicious login attempts and successful access.
+This project documents a hands-on Windows Event Log investigation using Windows Event Viewer, Security Event Logs, and Sysmon. The lab explores how Windows records system activities, including user authentication, account management, process execution, file creation, registry modifications, and network connections.
 
-Key Event IDs:
-4624: Successful logon.
-4625: Failed logon.
+The objective is to analyse extracted .evtx files, identify suspicious activities, extract Indicators of Compromise (IOCs), and reconstruct an attack chain from available endpoint logs.
 
-Findings:
+2. Windows Logon Events Analysis
+
+Windows Security logs provide visibility into authentication activities and help identify suspicious login attempts.
+
+Event ID 4624: Successful account logon.
+
+Event ID 4625: Failed account logon.
+
+Logon Type 10: RemoteInteractive logon, commonly associated with Remote Desktop Protocol (RDP).
+
+Investigation Findings:
+
 Brute-force source IP: 10.10.53.248
+
 Compromised account: Administrator
-Malicious RDP logon type: 10 (RemoteInteractive)
 
-User Account Management
-Investigated account creation and security group modifications to identify possible persistence and privilege escalation.
-Key Event IDs:
-4720: User account created.
-4726: User account deleted.
-4732: Member added to a security-enabled local group.
-4733: Member removed from a security-enabled local group.
+Malicious RDP logon identified through Logon Type 10.
 
-Findings:
-Unauthorised account: svc_sysrestore
-Groups targeted: Backup Operators and Remote Desktop Users
-Process Monitoring with Sysmon
-Used process creation logs to investigate application execution and identify suspicious downloaded files.
+3. User Account Management
 
-Key Event IDs:
-4688: Windows process creation.
-Sysmon Event ID 1: Process creation with additional process details.
+Attackers may create unauthorised accounts or modify security group memberships to establish persistence and gain elevated privileges.
 
-Findings:
+Important Windows Event IDs:
+
+Event ID 4720: User account creation.
+
+Event ID 4726: User account deletion.
+
+Event ID 4732: Member added to a security-enabled local group.
+
+Event ID 4733: Member removed from a security-enabled local group.
+
+Investigation Findings:
+
+Backdoor account created: svc_sysrestore
+
+Privileged groups targeted:
+
+Backup Operators
+
+Remote Desktop Users
+
+4. Process Monitoring with Sysmon
+
+Process monitoring helps analysts understand how suspicious applications and commands are executed on a compromised endpoint.
+
+Windows Event ID 4688: Process creation.
+
+Sysmon Event ID 1: Process creation with additional details, including command-line arguments, parent process information, and process hashes where configured.
+
+Investigation Findings:
+
 Browser identified: Google Chrome.
-Downloaded file: C:\Users\sarah.miller\Downloads\ckjg.exe
+
+Downloaded executable: ckjg.exe
+
+Download location: C:\Users\sarah.miller\Downloads\ckjg.exe
+
 Download URL: http://gettsveriff.com/bgj3/ckjg.exe
-File and Network Activity Investigation
 
-Investigated file creation, registry modifications, network connections, and DNS queries to identify malware activity and possible persistence mechanisms.
+5. File & Network Activity Investigation
 
-Key Sysmon Event IDs:
-11: File creation.
-13: Registry value set.
-3: Network connection.
-22: DNS query.
+Sysmon provides valuable visibility into file operations, registry modifications, network connections, and DNS queries that may indicate malicious activity.
 
-Findings:
-Suspected C2 IP and port: 193.46.217.4:7777
+Important Sysmon Event IDs:
+
+Event ID 11: File creation.
+
+Event ID 13: Registry value set.
+
+Event ID 3: Network connection.
+
+Event ID 22: DNS query.
+
+Investigation Findings:
+
+Investigated malware-created files for possible persistence.
+
+Suspected Command-and-Control (C2) destination: 193.46.217.4:7777
+
 Associated DNS query: hkfasfsafg.click
-PowerShell Activity Monitoring
-Examined PowerShell command history to identify commands executed by users and understand how attackers may abuse legitimate administrative tools.
 
-Key investigation areas:
+6. PowerShell Activity Monitoring
 
-PSReadLine command history.
-PowerShell Script Block Logging (Event ID 4104).
-PowerShell Module Logging (Event ID 4103).
+PowerShell is a legitimate Windows administration tool that can also be abused by attackers to execute commands, perform reconnaissance, and maintain persistence.
 
-Finding:
+Important PowerShell Logging Sources:
+
+Event ID 4103: PowerShell Module Logging.
+
+Event ID 4104: PowerShell Script Block Logging.
+
+PSReadLine History: Records commands entered in an interactive PowerShell session.
+
+The investigation involved examining PowerShell command history to identify suspicious commands and retrieve information stored by other local users.
+
+Investigation Finding:
 
 The first command recorded in the Administrator's PowerShell history was:
+
 Get-ComputerInfo
-Tools & Technologies
-Windows Event Viewer: Windows Security and Sysmon log analysis.
-Windows Security Logs: Authentication and account management investigation.
-Sysmon: Process, file, registry, and network activity monitoring.
-PowerShell: Command history and system investigation.
 
-TryHackMe: Practical lab environment and extracted event logs.
+7. 📑 Lab Walkthrough & Documentation
 
-Key Takeaways
+Due to the extensive nature of this practical lab, including Windows Security Event Log analysis, Sysmon investigations, PowerShell command history examination, and evidence screenshots, the full step-by-step documentation has been placed in a dedicated file.
 
-Through this project, I gained practical experience in:
-Analysing Windows authentication events to identify brute-force attacks and suspicious logins.
-Investigating unauthorised account creation and privilege escalation.
-Using Sysmon to trace process execution, file activity, and network connections.
-Identifying suspicious files, domains, and Command-and-Control infrastructure.
-Investigating PowerShell command history and understanding the importance of PowerShell logging.
-Correlating events across different log sources to reconstruct an attack timeline.
+👉 Read the Full Step-by-Step Windows Event Log Analysis Walkthrough
 
-Conclusion:
+8. Tools & Technologies Used
 
-This project strengthened my understanding of Windows endpoint monitoring and the role of event log analysis in SOC operations. It demonstrated how seemingly isolated events can be connected to uncover malicious activities, trace attacker behaviour, and identify indicators of compromise.
+Windows Event Viewer: Analysing Windows Security and Sysmon event logs.
 
-The key lesson: 
+Windows Security Logs: Investigating authentication and account management activities.
 
-Effective threat detection is not just about identifying individual suspicious events; it is about correlating evidence across multiple log sources to understand the complete attack chain.
+Sysmon: Monitoring process execution, file activity, registry changes, and network connections.
+
+PowerShell: Examining command history and investigating system activities.
+
+TryHackMe: Practical lab environment and extracted Windows event logs.
+
+9. Conclusion
+
+This project demonstrates how Windows Event Logs and Sysmon provide essential visibility into endpoint activities. By correlating authentication events, account modifications, process execution, file activity, and network connections, SOC analysts can identify suspicious behaviour and reconstruct an attack sequence.
