@@ -2,6 +2,7 @@ WINDOWS-EVENT-LOG-ANALYSIS-PROJECT
 Windows Event Log Analysis for Threat Detection & Incident Investigation
 
 Table of Contents
+
 Project Overview
 Windows Logon Events Analysis
 User Account Management
